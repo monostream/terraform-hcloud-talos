@@ -54,3 +54,8 @@ output "autoscaler_worker_machine_config" {
   value       = length(data.talos_machine_configuration.autoscaler_worker) > 0 ? data.talos_machine_configuration.autoscaler_worker[0].machine_configuration : ""
   sensitive   = true
 }
+
+output "talos_image_id_x86" {
+  description = "ID of the Talos x86 image/snapshot used for nodes"
+  value       = try(data.hcloud_image.x86[0].id, null)
+}
