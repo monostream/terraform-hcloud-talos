@@ -48,3 +48,9 @@ output "talos_worker_ids" {
   description = "Server IDs of the hetzner talos workers machines"
   value       = { for id, server in hcloud_server.workers : id => server.id }
 }
+
+output "autoscaler_worker_machine_config" {
+  description = "Worker machine configuration for autoscaler use (generated when no workers are defined)"
+  value       = length(data.talos_machine_configuration.autoscaler_worker) > 0 ? data.talos_machine_configuration.autoscaler_worker[0].machine_configuration : ""
+  sensitive   = true
+}

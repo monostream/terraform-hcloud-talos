@@ -88,3 +88,77 @@ locals {
     }
   }
 }
+
+  # Worker YAML template for autoscaler (used when no real workers exist).
+  # Same config patches as real workers but without node-specific values.
+  autoscaler_worker_yaml = {
+    machine = {
+      install = {
+        image = "ghcr.io/siderolabs/installer:${var.talos_version}"
+      }
+      certSANs = local.cert_SANs
+      kubelet = {
+        extraArgs = merge(
+          {
+            "cloud-provider"             = "external"
+            "rotate-server-certificates" = true
+          },
+          var.kubelet_extra_args
+        )
+        nodeIP = {
+          validSubnets = [
+            local.node_ipv4_cidr
+          ]
+        }
+      }
+      network = {
+        extraHostEntries = local.extra_host_entries
+        kubespan = {
+          enabled = var.enable_kube_span
+          advertiseKubernetesNetworks : false
+          mtu : 1370
+        }
+      }
+      kernel = {
+        modules = var.kernel_modules_to_load
+      }
+      sysctls = merge(
+        {
+          "net.core.somaxconn"          = "65535"
+          "net.core.netdev_max_backlog" = "4096"
+        },
+        var.sysctls_extra_args
+      )
+      features = {
+        hostDNS = {
+          enabled              = true
+          forwardKubeDNSToHost = true
+          resolveMemberNames   = true
+        }
+      }
+      time = {
+        servers = [
+          "ntp1.hetzner.de",
+          "ntp2.hetzner.com",
+          "ntp3.hetzner.net",
+          "time.cloudflare.com"
+        ]
+      }
+      nodeLabels = {}
+      registries = var.registries
+    }
+    cluster = {
+      network = {
+        dnsDomain = var.cluster_domain
+        podSubnets = [
+          local.pod_ipv4_cidr
+        ]
+        serviceSubnets = [
+          local.service_ipv4_cidr
+        ]
+        cni = {
+          name = "none"
+        }
+      }
+    }
+  }

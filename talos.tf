@@ -162,3 +162,19 @@ locals {
     client_key             = base64decode(talos_cluster_kubeconfig.this[0].kubernetes_client_configuration.client_key)
   }
 }
+
+# Generate a worker machine config template for autoscaler use.
+# This produces a valid worker config even when no worker nodes are defined,
+# using the same machine secrets and cluster configuration as real workers.
+data "talos_machine_configuration" "autoscaler_worker" {
+  count              = local.worker_count == 0 ? 1 : 0
+  talos_version      = var.talos_version
+  cluster_name       = var.cluster_name
+  cluster_endpoint   = local.cluster_endpoint_url_internal
+  kubernetes_version = var.kubernetes_version
+  machine_type       = "worker"
+  machine_secrets    = talos_machine_secrets.this.machine_secrets
+  config_patches     = concat([yamlencode(local.autoscaler_worker_yaml)], var.talos_worker_extra_config_patches)
+  docs               = false
+  examples           = false
+}
