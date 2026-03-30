@@ -37,13 +37,10 @@ variable "cluster_api_host_private" {
   EOF
 
   validation {
-    condition = var.cluster_api_host_private == null || (
-      var.cluster_api_host_private == trimspace(var.cluster_api_host_private) &&
-      trimspace(var.cluster_api_host_private) != "" &&
-      length(regexall("://", var.cluster_api_host_private)) == 0 &&
-      length(regexall(":", var.cluster_api_host_private)) == 0 &&
-      can(regex("^[0-9A-Za-z]([0-9A-Za-z-]*[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]*[0-9A-Za-z])?)*$", var.cluster_api_host_private))
-    )
+    condition = var.cluster_api_host_private == null || can(regex(
+      "^[0-9A-Za-z]([0-9A-Za-z-]*[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]*[0-9A-Za-z])?)*$",
+      var.cluster_api_host_private
+    ))
 
     error_message = "cluster_api_host_private must be null or a non-empty DNS hostname without scheme or port (example: kube.example.com)."
   }
@@ -71,13 +68,10 @@ variable "cluster_api_host" {
   default     = null
 
   validation {
-    condition = var.cluster_api_host == null || (
-      var.cluster_api_host == trimspace(var.cluster_api_host) &&
-      trimspace(var.cluster_api_host) != "" &&
-      length(regexall("://", var.cluster_api_host)) == 0 &&
-      length(regexall(":", var.cluster_api_host)) == 0 &&
-      can(regex("^[0-9A-Za-z]([0-9A-Za-z-]*[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]*[0-9A-Za-z])?)*$", var.cluster_api_host))
-    )
+    condition = var.cluster_api_host == null || can(regex(
+      "^[0-9A-Za-z]([0-9A-Za-z-]*[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]*[0-9A-Za-z])?)*$",
+      var.cluster_api_host
+    ))
 
     error_message = "cluster_api_host must be null or a non-empty hostname/IP without scheme or port (example: kube.example.com)."
   }
