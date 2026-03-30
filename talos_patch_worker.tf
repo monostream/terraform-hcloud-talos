@@ -87,7 +87,6 @@ locals {
       }
     }
   }
-}
 
   # Worker YAML template for autoscaler (used when no real workers exist).
   # Same config patches as real workers but without node-specific values.
@@ -162,3 +161,4 @@ locals {
       }
     }
   }
+}
